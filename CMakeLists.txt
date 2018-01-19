@@ -267,8 +267,11 @@ IF(APPLE)
         ENDIF()
 
         SET (IPHONE_ENABLE_BITCODE "NO" CACHE STRING "IOS Enable Bitcode")
+
+        # Apple iOS: Hint to find ZLIB
+        set(ZLIB_ROOT ${IPHONE_SDKROOT}/usr)
         # Apple iOS: Find OpenGLES
-        FIND_LIBRARY(OPENGLES_LIBRARY OpenGLES)
+        FIND_LIBRARY(OPENGLES_LIBRARY OpenGLES PATHS ${IPHONE_SDKROOT}/System/Library PATH_SUFFIXES Frameworks NO_DEFAULT_PATH)
     ELSE ()
         FIND_LIBRARY(CARBON_LIBRARY Carbon)
         FIND_LIBRARY(COCOA_LIBRARY Cocoa)
