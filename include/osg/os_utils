@@ -20,24 +20,26 @@
     #include <stdlib.h>
 #endif
 
+#if !defined(OSG_SYSTEM_SUPPORTED) && !defined(WIN32)
+    #include <spawn.h>
+#endif
+
 #ifdef OSG_ENVVAR_SUPPORTED
     #include <sstream>
 #endif
 
 namespace osg {
 
+inline int system(const char* command)
+{
 #ifdef OSG_SYSTEM_SUPPORTED
-inline int system(const char* command)
-{
     return ::system(command);
-}
 #else
-inline int system(const char* command)
-{
-    OSG_WARN<<"system("<<command<<") not supported on this platform."<<std::endl;
-    return 0;
-}
+    pid_t pid;
+    posix_spawn(&pid, command, NULL, NULL, NULL, NULL);
+    return waitpid(pid, NULL, 0);
 #endif
+}
 
 inline unsigned int getClampedLength(const char* str, unsigned int maxNumChars=4096)
 {
@@ -52,8 +54,7 @@ inline std::string getEnvVar(const char* name)
     const char* ptr = getenv(name);
     if (ptr) value.assign(ptr, getClampedLength(ptr));
     return value;
- }
-
+}
 
 template<typename T>
 inline bool getEnvVar(const char* name, T& value)
